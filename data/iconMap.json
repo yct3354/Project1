@@ -1,0 +1,22 @@
+[
+  { "tagText": "Accomodation", "name": "house-chimney", "lib": "F6" },
+  { "tagText": "Extra Cost", "name": "hand-holding-dollar", "lib": "F6" },
+  { "tagText": "Food", "name": "fastfood", "lib": "Material" },
+  { "tagText": "Daily Groceries", "name": "cart-shopping", "lib": "F6" },
+  { "tagText": "Transportation", "name": "train", "lib": "Material" },
+  {
+    "tagText": "Foreign Exchange",
+    "name": "arrow-right-arrow-left",
+    "lib": "F6"
+  },
+  {
+    "tagText": "Miscellaneous",
+    "name": "miscellaneous-services",
+    "lib": "Material"
+  },
+  { "tagText": "x", "name": "x", "lib": "Feather" },
+  { "tagText": "plus", "name": "plus", "lib": "Feather" },
+  { "tagText": "search", "name": "search", "lib": "Feather" },
+  { "tagText": "check", "name": "check", "lib": "Feather" },
+  { "tagText": "", "name": "egg", "lib": "F6" }
+]

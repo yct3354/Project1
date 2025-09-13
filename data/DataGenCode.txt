@@ -1,0 +1,76 @@
+[
+  '{{repeat(500, 500)}}',
+  {
+    _id: '{{objectId()}}',
+    date: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-ddTHH:mm")}}',
+    tag: '{{random("Food","Accomodation","Daily Groceries", "Miscellaneous", "Extra Cost", "Transportation")}}',
+	currency: '{{random("EUR","HKD","USD", "SEK")}}',
+    title: function (tags) {
+      var list = [];
+      if (this.tag === 'Food') {
+        list = ["Apple", "Onions", "Pork", "Milk", "Butter",								"Oil","Salt","Sugar","Tofu","Pesto","Mushroom", "Shalots","Chicken", "Beef","Fish","Eggs","Sausage"];
+			return list[tags.integer(0,list.length-1)];
+      }
+	if (this.tag === 'Accomodation') {
+		return 'Rent';
+      }
+	if (this.tag === 'Daily Groceries') {
+        list = ['Shampoo', 'Toilet Paper', 'Kitchen Paper', 'Toothpaste', 'Trash Bag', 'Detergent'];
+			return list[tags.integer(0,list.length-1)];
+      }
+	if (this.tag === 'Miscellaneous') {
+        list = ['Haircut','Gym', 'Data'];
+			return list[tags.integer(0,list.length-1)];
+      }
+	if (this.tag === 'Extra Cost') {
+        list = ['Max','Fish Soup', 'Beer', 'McDonalds'];
+			return list[tags.integer(0,list.length-1)];
+      }
+	if (this.tag === 'Transportation') {
+        list = ['Bus', 'Monthly Ticket', 'Metro', 'Train'];
+			return list[tags.integer(0,list.length-1)];
+      }
+    },
+    
+    amount: function (tags) {
+		var scale = 0;
+		var min = 0;
+            var max = 0;
+        switch (this.tag) {
+			case 'Food':
+            scale = 1;
+            break;
+          case 'Accomodation':
+            scale = 50;
+            break;
+          case 'Daily Groceries':
+            scale = 1;
+            break;
+          case 'Miscellaneous':
+            scale = 3;
+            break;
+          case 'Extra Cost':
+            scale = 2.5;
+            break;
+          case 'Transportation':
+            scale = 1;
+            break;
+        }
+        switch (this.currency) {
+          case 'EUR':
+            max = 10;
+            break;
+          case 'SEK':
+            max = 100;
+          break;
+          case 'HKD':
+            max = 100;
+          break;
+          case 'USD':
+            max = 10;
+          break;
+		}
+		return tags.floating(min,max*scale,2);
+		}
+	}
+]

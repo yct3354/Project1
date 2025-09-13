@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "tag": "EUR",
+    "rate": 9.1208,
+    "balance": 10083.41,
+    "active": true,
+    "sign": "€",
+    "signLocation": "front"
+  },
+  {
+    "id": 2,
+    "tag": "USD",
+    "rate": 7.8498,
+    "balance": 6000,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 3,
+    "tag": "SEK",
+    "rate": 0.812,
+    "balance": 65797.03,
+    "active": true,
+    "sign": "kr",
+    "signLocation": "back"
+  },
+  {
+    "id": 4,
+    "tag": "JPY",
+    "rate": 0.05308,
+    "balance": 140000,
+    "active": true,
+    "sign": "¥",
+    "signLocation": "front"
+  },
+  {
+    "id": 5,
+    "tag": "CHF",
+    "rate": 9.6745,
+    "balance": 0,
+    "active": false,
+    "sign": "₣",
+    "signLocation": "front"
+  },
+  {
+    "id": 6,
+    "tag": "CNY",
+    "rate": 1.0921,
+    "balance": 0,
+    "active": false,
+    "sign": "Ұ",
+    "signLocation": "front"
+  },
+  {
+    "id": 7,
+    "tag": "HKD",
+    "rate": 1,
+    "balance": 113010.15,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 8,
+    "tag": "GBP",
+    "rate": 10.535,
+    "balance": 100,
+    "active": true,
+    "sign": "£",
+    "signLocation": "front"
+  }
+]

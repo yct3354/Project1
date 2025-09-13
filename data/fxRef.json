@@ -1,0 +1,173 @@
+[
+  {
+    "id": 1,
+    "tag": "EUR",
+    "rate": 9.1208,
+    "balance": 0,
+    "active": true,
+    "sign": "€",
+    "signLocation": "front"
+  },
+  {
+    "id": 2,
+    "tag": "USD",
+    "rate": 7.8498,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 3,
+    "tag": "SEK",
+    "rate": 0.812,
+    "balance": 0,
+    "active": true,
+    "sign": "kr",
+    "signLocation": "back"
+  },
+  {
+    "id": 4,
+    "tag": "JPY",
+    "rate": 0.05308,
+    "balance": 0,
+    "active": true,
+    "sign": "¥",
+    "signLocation": "front"
+  },
+  {
+    "id": 5,
+    "tag": "CHF",
+    "rate": 9.6745,
+    "balance": 0,
+    "active": false,
+    "sign": "₣",
+    "signLocation": "front"
+  },
+  {
+    "id": 6,
+    "tag": "CNY",
+    "rate": 1.0921,
+    "balance": 0,
+    "active": false,
+    "sign": "Ұ",
+    "signLocation": "front"
+  },
+  {
+    "id": 7,
+    "tag": "HKD",
+    "rate": 1,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 8,
+    "tag": "GBP",
+    "rate": 10.535,
+    "balance": 0,
+    "active": true,
+    "sign": "£",
+    "signLocation": "front"
+  },
+  {
+    "id": 9,
+    "tag": "CAD",
+    "rate": 5.6463,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 10,
+    "tag": "AUD",
+    "rate": 5.0641,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 11,
+    "tag": "SGD",
+    "rate": 6.0545,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 12,
+    "tag": "NZD",
+    "rate": 4.5613,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 13,
+    "tag": "INR",
+    "rate": 0.0886,
+    "balance": 0,
+    "active": true,
+    "sign": "₹",
+    "signLocation": "front"
+  },
+  {
+    "id": 14,
+    "tag": "KRW",
+    "rate": 0.005589,
+    "balance": 0,
+    "active": true,
+    "sign": "₩",
+    "signLocation": "front"
+  },
+  {
+    "id": 15,
+    "tag": "TWD",
+    "rate": 0.254,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "front"
+  },
+  {
+    "id": 16,
+    "tag": "NOK",
+    "rate": 0.7694,
+    "balance": 0,
+    "active": true,
+    "sign": "kr",
+    "signLocation": "back"
+  },
+  {
+    "id": 17,
+    "tag": "DKK",
+    "rate": 1.2112,
+    "balance": 0,
+    "active": true,
+    "sign": "$",
+    "signLocation": "back"
+  },
+  {
+    "id": 18,
+    "tag": "THB",
+    "rate": 0.2385,
+    "balance": 0,
+    "active": true,
+    "sign": "฿",
+    "signLocation": "front"
+  },
+  {
+    "id": 19,
+    "tag": "IDR",
+    "rate": 0.00047643496,
+    "balance": 0,
+    "active": true,
+    "sign": "Rp",
+    "signLocation": "front"
+  }
+]
