@@ -1,5 +1,4 @@
 import CustomButton from "@/components/customButton";
-import IntegratedTab from "@/components/Shared/IntegratedTab";
 import * as SQLiteAPI from "@/components/SQLiteAPI";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -17,8 +16,8 @@ import {
   View,
 } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 import GroupTab from "./GroupTab";
+import IntegratedList from "./IntegratedList";
 
 const DW = Dimensions.get("window").width;
 const DH = Dimensions.get("window").height;
@@ -69,30 +68,41 @@ export default function GroupView() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const [username, setUsername] = useState("");
-  const [userpassword, setUserpassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [loginUnsuccessful, setLoginUnsuccessful] = useState(false);
   const [signup, setSignup] = useState(false);
-  const [passwordHidden, setPasswordHidden] = useState(true);
-  const [repeatPasswordHidden, setRepeatPasswordHidden] = useState(true);
 
-  const [userGroupTable, setUserGroupTable] = useState([]);
   const [groupTable, setGroupTable] = useState([]);
   const [unsortedTransaction, setUnsortedTransaction] = useState([]);
   const [tagList, setTagList] = useState([]);
-  const [sessionTable, setSessionTable] = useState([]);
-  const [transactionTable, setTransactionTable] = useState([]);
+  const [modifiedIndex, setModifiedIndex] = useState(-1);
+  const [listLoaded, setListLoaded] = useState(false);
 
-  const loadFade = useRef(new Animated.Value(1)).current;
+  const loadFade = useRef(new Animated.Value(0)).current;
+  const listSlide = useRef(new Animated.Value(0)).current;
 
   const fetchData = async () => {
-    const tableB: any = await SQLiteAPI.GetGroup(db);
-    const tableD: any = await SQLiteAPI.GetUnsortedTransaction(db);
-    const tableT: any = await SQLiteAPI.GetTags(db);
-    setGroupTable(tableB);
-    setUnsortedTransaction(tableD);
-    setTagList(tableT);
+    try {
+      const tableB: any = await SQLiteAPI.GetGroup(db);
+      const tableD: any = await SQLiteAPI.GetUnsortedTransaction(db);
+      const tableT: any = await SQLiteAPI.GetTags(db);
+      setGroupTable(tableB);
+      setUnsortedTransaction(tableD);
+      setTagList(tableT);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setListLoaded(true);
+    }
+  };
+
+  const scrapAll = () => {
+    Animated.timing(listSlide, {
+      toValue: DW * 2,
+      duration: 150,
+      // easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start(() => {
+      setUnsortedTransaction([]);
+    });
   };
 
   // const InsertUserGroup = async () => {
@@ -185,18 +195,15 @@ export default function GroupView() {
       useNativeDriver: true,
     }).start();
   };
-  const FadeOut = () => {
-    Animated.timing(loadFade, {
-      toValue: 0,
-      // delay: 5,
-      duration: 300,
-      // easing: Easing.out(Easing.exp),
-      useNativeDriver: true,
-    }).start(() => {
-      setSignup(!signup);
-      setLoginUnsuccessful(false);
-    });
-  };
+  // const FadeOut = () => {
+  //   Animated.timing(loadFade, {
+  //     toValue: 0,
+  //     // delay: 5,
+  //     duration: 300,
+  //     // easing: Easing.out(Easing.exp),
+  //     useNativeDriver: true,
+  //   }).start(() => {});
+  // };
 
   useEffect(() => {
     fetchData();
@@ -209,6 +216,21 @@ export default function GroupView() {
       // console.log("Finished Loading.");
     }
   }, [refreshing]);
+
+  useEffect(() => {
+    if (modifiedIndex != -1) {
+      const data = [...unsortedTransaction];
+      data.splice(modifiedIndex, 1);
+      setUnsortedTransaction(data);
+      setModifiedIndex(-1);
+    }
+  }, [modifiedIndex]);
+
+  useEffect(() => {
+    if (listLoaded) {
+      FadeIn();
+    }
+  }, [listLoaded]);
 
   return (
     <LinearGradient
@@ -225,220 +247,232 @@ export default function GroupView() {
         locations={[0, 0, ...linspace(0, 1, 50)]}
         style={styles.topBar}
       ></LinearGradient>
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ height: StatusBar.currentHeight }}></View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: themeColor,
+          alignItems: "center",
+          justifyContent: "center",
+
+          overflow: "hidden",
+          width: "100%",
+        }}
+      >
         <View
           style={{
             flex: 1,
-            backgroundColor: themeColor,
             alignItems: "center",
-            justifyContent: "center",
-
             overflow: "hidden",
             width: "100%",
           }}
         >
           <View
             style={{
-              flex: 1,
-              alignItems: "center",
-              overflow: "hidden",
               width: "100%",
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                paddingHorizontal: 20 * ScaleFactor,
-                paddingVertical: 15 * ScaleFactor,
-                flexDirection: "row",
-                // top:'0%'
-              }}
-            >
-              <CustomButton
-                onPressOut={() => {
-                  navigation.goBack();
-                }}
-                buttonStyle={{
-                  height: 40 * ScaleFactor,
-                  width: 40 * ScaleFactor,
-                  borderRadius: 20,
-                  backgroundColor: plateColor,
-                }}
-              >
-                <Feather
-                  name="arrow-left"
-                  size={24 * ScaleFactor}
-                  color={accentColor}
-                />
-              </CustomButton>
-            </View>
-            <View
-              style={{
-                // flex: 1,
-                // alignItems: "center",
-                paddingBottom: 5 * ScaleFactor,
-              }}
-            >
-              <View
-                style={{
-                  // paddingBottom: 5 * ScaleFactor,
-                  paddingHorizontal: 25 * ScaleFactor,
-                  // width: "100%",
-                  justifyContent: "center",
-                  // backgroundColor: "red",
-                }}
-              >
-                <Text style={styles.mainText}>{"To be sorted"}</Text>
-              </View>
-              <View
-                style={{
-                  height: DH * 0.27,
-                  borderRadius: 20 * ScaleFactor,
-                  marginBottom: 0 * ScaleFactor,
-                  justifyContent: "center",
-                }}
-              >
-                <FlatList
-                  data={unsortedTransaction}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item }: any) => (
-                    <IntegratedTab item={item} tagList={tagList} />
-                  )}
-                ></FlatList>
-                <LinearGradient
-                  colors={[
-                    transparentC,
-                    transparentC,
-                    ...[...transparentFade(themeColor, 50, 255)].reverse(),
-                  ]}
-                  locations={[0, 0, ...linspace(0, 1, 50)]}
-                  start={[0, 1]}
-                  end={[0, 0]}
-                  style={{
-                    width: "100%",
-                    height: 20 * ScaleFactor,
-                    position: "absolute",
-                    top: "0%",
-                  }}
-                ></LinearGradient>
-                <LinearGradient
-                  colors={[
-                    transparentC,
-                    transparentC,
-                    ...[...transparentFade(themeColor, 50, 255)].reverse(),
-                  ]}
-                  locations={[0, 0, ...linspace(0, 1, 50)]}
-                  start={[0, 0]}
-                  end={[0, 1]}
-                  style={{
-                    width: "100%",
-                    height: 20 * ScaleFactor,
-                    position: "absolute",
-                    bottom: "0%",
-                  }}
-                ></LinearGradient>
-              </View>
-            </View>
-            <View
-              style={{
-                // flex: 1,
-                paddingTop: 15 * ScaleFactor,
-              }}
-            >
-              <View
-                style={{
-                  // paddingTop: 10 * ScaleFactor,
-                  // paddingBottom: 10 * ScaleFactor,
-                  width: "100%",
-                  paddingHorizontal: 25 * ScaleFactor,
-                }}
-              >
-                <Text style={styles.mainText}>{"Your groups"}</Text>
-              </View>
-              <View
-                style={{
-                  // height: DH * 0.45,
-                  flex: 1,
-                  // backgroundColor: plateColor,
-                  borderRadius: 20 * ScaleFactor,
-                  // marginHorizontal: 20 * ScaleFactor,
-                  paddingVertical: 20 * ScaleFactor,
-                  marginHorizontal: 10 * ScaleFactor,
-                  // borderColor: accentColor,
-                  // borderWidth: 2,
-                }}
-              >
-                <FlatList
-                  data={groupTable}
-                  renderItem={({ item }: any) => (
-                    <GroupTab
-                      item={item}
-                      groupID={item.group_id}
-                      userGroupID={item.user_group_id}
-                    />
-                  )}
-                ></FlatList>
-              </View>
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                // padding: 5 * ScaleFactor,
-                position: "absolute",
-                right: "3%",
-                bottom: "5%",
-              }}
-            >
-              <CustomButton
-                onPressOut={() => {
-                  // navigation.popToTop();
-                }}
-                frameStyle={{ padding: 10 * ScaleFactor }}
-                buttonStyle={{
-                  height: 54,
-                  width: 54,
-                  backgroundColor: plateColor,
-                  elevation: 5,
-                }}
-              >
-                <Feather name="plus" size={36} color={accentColor} />
-              </CustomButton>
-            </View>
-          </View>
-          <LinearGradient
-            colors={[
-              transparentC,
-              transparentC,
-              ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
-            ]}
-            locations={[0, 0, ...linspace(0, 1, 50)]}
-            style={{
-              width: "100%",
-              height: 50 * ScaleFactorVert,
-              bottom: 0,
-              position: "absolute",
-              paddingHorizontal: 15 * ScaleFactor,
-              paddingBottom: 10 * ScaleFactor,
+              paddingHorizontal: 20 * ScaleFactor,
+              paddingVertical: 15 * ScaleFactor,
               flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
             }}
           >
             <CustomButton
               onPressOut={() => {
-                navigation.popToTop();
+                navigation.goBack();
               }}
               buttonStyle={{
-                height: 60,
-                width: 60,
+                height: 40 * ScaleFactor,
+                width: 40 * ScaleFactor,
+                borderRadius: 20,
+                backgroundColor: plateColor,
               }}
             >
-              <MaterialIcons name="person" size={30} color={accentColor} />
+              <Feather
+                name="arrow-left"
+                size={24 * ScaleFactor}
+                color={accentColor}
+              />
             </CustomButton>
-          </LinearGradient>
+          </View>
+          <View
+            style={{
+              paddingBottom: 5 * ScaleFactor,
+            }}
+          >
+            <View
+              style={{
+                paddingBottom: 5 * ScaleFactor,
+                paddingHorizontal: 25 * ScaleFactor,
+                width: "100%",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              <View style={{}}>
+                <Text style={styles.mainText}>{"To be sorted"}</Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  paddingLeft: 10 * ScaleFactor,
+                  flexDirection: "row-reverse",
+                }}
+              >
+                <CustomButton
+                  onPressOut={() => {
+                    scrapAll();
+                  }}
+                  frameStyle={{ paddingLeft: 10 * ScaleFactor }}
+                  buttonStyle={{
+                    height: 35 * ScaleFactor,
+                    borderColor: accentColor,
+                    borderWidth: 2,
+                    flexDirection: "row",
+                    paddingHorizontal: 10 * ScaleFactor,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "#FF3B30",
+                      fontSize: 16 * ScaleFactor,
+                      fontWeight: "500",
+                    }}
+                    numberOfLines={1}
+                  >
+                    {"Scrap All"}
+                  </Text>
+                </CustomButton>
+                <CustomButton
+                  onPressOut={() => {}}
+                  frameStyle={{ paddingLeft: 10 * ScaleFactor }}
+                  buttonStyle={{
+                    height: 35 * ScaleFactor,
+                    borderColor: accentColor,
+                    borderWidth: 2,
+                    flexDirection: "row",
+                    paddingHorizontal: 10 * ScaleFactor,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: accentColor,
+                      fontSize: 16 * ScaleFactor,
+                      fontWeight: "500",
+                    }}
+                    numberOfLines={1}
+                  >
+                    {"Accept All"}
+                  </Text>
+                </CustomButton>
+              </View>
+            </View>
+            <Animated.View
+              style={{
+                opacity: loadFade,
+              }}
+            >
+              <IntegratedList
+                unsortedTransaction={unsortedTransaction}
+                tagList={tagList}
+                setModifiedIndex={setModifiedIndex}
+                modifiedIndex={modifiedIndex}
+                deleteSlide={listSlide}
+              ></IntegratedList>
+            </Animated.View>
+          </View>
+          <View
+            style={{
+              // flex: 1,
+              paddingTop: 15 * ScaleFactor,
+              width: "100%",
+              // backgroundColor: "red",
+              height: "55%",
+              // alignItems: "flex-start",
+            }}
+          >
+            <View style={{ paddingHorizontal: 25 * ScaleFactor }}>
+              <Text style={styles.mainText}>{"Your groups"}</Text>
+            </View>
+            <Animated.View
+              style={{
+                // flex: 1,
+                borderRadius: 20 * ScaleFactor,
+                paddingVertical: 5 * ScaleFactor,
+                marginHorizontal: 10 * ScaleFactor,
+                opacity: loadFade,
+                // backgroundColor: "red",
+              }}
+            >
+              <FlatList
+                data={groupTable}
+                renderItem={({ item }: any) => (
+                  <GroupTab
+                    item={item}
+                    groupID={item.group_id}
+                    userGroupID={item.user_group_id}
+                  />
+                )}
+              ></FlatList>
+            </Animated.View>
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              // padding: 5 * ScaleFactor,
+              position: "absolute",
+              right: "3%",
+              bottom: "5%",
+            }}
+          >
+            <CustomButton
+              onPressOut={() => {
+                navigation.navigate("AddGroup");
+              }}
+              frameStyle={{ padding: 10 * ScaleFactor }}
+              buttonStyle={{
+                height: 54,
+                width: 54,
+                backgroundColor: plateColor,
+                elevation: 5,
+              }}
+            >
+              <Feather name="plus" size={36} color={accentColor} />
+            </CustomButton>
+          </View>
         </View>
-      </SafeAreaView>
+        <LinearGradient
+          colors={[
+            transparentC,
+            transparentC,
+            ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
+          ]}
+          locations={[0, 0, ...linspace(0, 1, 50)]}
+          style={{
+            width: "100%",
+            height: 50 * ScaleFactorVert,
+            bottom: 0,
+            position: "absolute",
+            paddingHorizontal: 15 * ScaleFactor,
+            paddingBottom: 10 * ScaleFactor,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CustomButton
+            onPressOut={() => {
+              navigation.popToTop();
+            }}
+            buttonStyle={{
+              height: 60,
+              width: 60,
+            }}
+          >
+            <MaterialIcons name="person" size={30} color={accentColor} />
+          </CustomButton>
+        </LinearGradient>
+      </View>
+      <View style={{ height: "1%" }}></View>
     </LinearGradient>
   );
 }

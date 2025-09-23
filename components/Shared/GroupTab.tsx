@@ -102,7 +102,7 @@ export default function GroupTab({
               <View
                 style={{
                   width: "20%",
-                  height: "100%",
+                  // height: "100%",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -133,10 +133,8 @@ const styles = StyleSheet.create({
   groupTab: {
     // backgroundColor: plateColor,
     borderRadius: 10 * ScaleFactor,
-    // marginVertical: 10 * ScaleFactor,
-    // paddingVertical: 5 * ScaleFactor,
     marginHorizontal: 15 * ScaleFactor,
-    // height: 80 * ScaleFactor,
+    marginVertical: 10 * ScaleFactor,
     flexDirection: "row",
     alignItems: "center",
   },

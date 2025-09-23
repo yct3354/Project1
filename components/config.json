@@ -1,4 +1,5 @@
 {
   "defaultCurrency": "HKD",
-  "devURL": "http://192.168.50.168:5050"
+  "devURL": "http://192.168.50.168:5050",
+  "defaultName": "Dev"
 }

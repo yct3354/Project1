@@ -1,5 +1,64 @@
+import uuid from "react-native-uuid";
+
+export const AddNewGroup = async (
+  db: any,
+  groupName: string,
+  currency: string,
+  userList: string[],
+  emoji: string
+) => {
+  const groupID = uuid.v4();
+  const timeStamp = Math.floor(Date.now() / 1000);
+  const selfUserGroupID = uuid.v4();
+
+  try {
+    await db.runAsync(
+      `INSERT INTO group_id_table (group_id , timeStamp,  group_name, emoji, user_group_id) VALUES (?,?,?,?,?)`,
+      [groupID, timeStamp, groupName, emoji, selfUserGroupID]
+    );
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+
+  userList.forEach(async (item, index) => {
+    try {
+      const userGroupID = uuid.v4();
+      await db.runAsync(
+        `INSERT INTO user_group_id_table (group_id , timeStamp, user_group_id, user_group_name, emoji) VALUES (?,?,?,?,?)`,
+        [
+          groupID,
+          timeStamp,
+          index === 0 ? selfUserGroupID : userGroupID,
+          item,
+          "",
+        ]
+      );
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  });
+};
+
+export const DeleteGroup = async (db: any, groupID: string) => {
+  try {
+    await db.runAsync(`DELETE group_id_table WHERE group_id = ?`, [groupID]);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+  try {
+    await db.runAsync(`DELETE user_group_id_table WHERE group_id = ?`, [
+      groupID,
+    ]);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const RemoveUserGroup = async (db: any, list: any[]) => {
-  console.log("removingU");
   list.forEach(async (item) => {
     try {
       await db.runAsync(
@@ -14,7 +73,6 @@ export const RemoveUserGroup = async (db: any, list: any[]) => {
 };
 
 export const AddUserGroup = async (db: any, list: any[]) => {
-  console.log("addingU");
   list.forEach(async (item) => {
     try {
       await db.runAsync(
@@ -309,7 +367,8 @@ export const GetUserGroup = async (db: any) => {
 export const GetUserGroupSum = async (db: any, user_group_id: any) => {
   try {
     return await db.getAllAsync(
-      `SELECT SUM(amount*rate) AS sum FROM transaction_table WHERE payer_payee = 0 AND user_group_id = ? GROUP BY user_group_id`,
+      // `SELECT IFNULL(SUM(amount*rate),0) AS sum FROM transaction_table WHERE payer_payee = 0 AND user_group_id = ? GROUP BY user_group_id`,
+      `SELECT COALESCE((SELECT SUM(amount*rate) AS sum FROM transaction_table WHERE payer_payee = 0 AND user_group_id = ? GROUP BY user_group_id),0) AS sum`,
       [user_group_id]
     );
   } catch (error) {

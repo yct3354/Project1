@@ -18,11 +18,11 @@ import {
   Dimensions,
   Easing,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const DW = Dimensions.get("window").width;
 const DH = Dimensions.get("window").height;
@@ -282,206 +282,209 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: topBarColor }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1 }}>
-          <ScrollView overScrollMode="always" style={styles.scrollPlate}>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "flex-start",
-                alignItems: "center",
-                // height: 1200,
-                backgroundColor: themeColor,
-              }}
-            >
-              <View style={styles.scrollOffset}></View>
-              <View style={styles.topPlate}>
-                <View style={styles.numberGrid}>
-                  <View style={styles.numberPlate}>
-                    <Text style={styles.mainTitle}>Monthly Expenditure</Text>
-                    <Animated.Text
-                      style={{ ...styles.mainAmount, opacity: loadFade }}
-                    >
-                      {hiddenState
-                        ? "***"
-                        : totalSum.toLocaleString(location, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }) +
-                          " " +
-                          config.defaultCurrency}
-                    </Animated.Text>
-                  </View>
-                  <CustomButton
-                    onPressOut={() => {
-                      // console.log("+ Pressed");
-                      setAddModalVisible(true);
-                    }}
-                    buttonStyle={{
-                      height: 40,
-                      width: 40,
-                      backgroundColor: { transparent },
-                    }}
-                  >
-                    <Feather name="plus" size={30} color={accentColor} />
-                  </CustomButton>
-                </View>
-                <View style={styles.chartGrid}>
-                  <View style={styles.chartPlate}>
-                    <PieAutoPlot
-                      width={DW}
-                      initTagList={tagList}
-                      hiddenState={hiddenState}
-                      loadOpacity={loadFade}
-                      isReloading={isReloading}
-                      setGlobalReload={setReloading}
-                    ></PieAutoPlot>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.midBar}>
-                <View style={styles.midLeftPlate}>
-                  <Text style={styles.secTitle}>Latest Transactions</Text>
-                </View>
-                <View style={styles.midRightPlate}>
-                  <CustomButton
-                    onPressOut={() => {
-                      navigation.navigate("FullList", { mode: "All" });
-                    }}
-                    buttonStyle={{
-                      height: 30,
-                      width: 80,
-                      borderRadius: 20,
-                      backgroundColor: plateColor,
-                      paddingHorizontal: 10,
-                    }}
-                  >
-                    <Text style={styles.secText}>See all</Text>
-                  </CustomButton>
-                </View>
-              </View>
-              <Animated.View
-                style={{
-                  width: "100%",
-                  // opacity: loadFade,
-                  transform: [{ translateY: loadSlide }],
-                }}
-              >
-                {Ldata.map((LatestTransaction: any) => {
-                  return (
-                    <InfoTab
-                      onPress={() => {}}
-                      plateStyle={{
-                        paddingHorizontal: 15,
-                        paddingVertical: 5,
-                      }}
-                      item={LatestTransaction}
-                      key={LatestTransaction._id}
-                      hiddenState={hiddenState}
-                      setGlobalReload={setReloading}
-                    ></InfoTab>
-                  );
-                })}
-              </Animated.View>
-              <FxList
-                hiddenState={hiddenState}
-                loadSlide={loadSlide}
-                isReloading={isReloading}
-              ></FxList>
-            </View>
-          </ScrollView>
-          <View style={styles.topBarBase}>
-            <LinearGradient
-              colors={[
-                topBarColor,
-                topBarColor,
-                ...transparentFade(topBarColorS, 50, 255),
-              ]}
-              locations={[0, 0, ...linspace(0, 1, 50)]}
-              style={styles.topBar}
-            >
-              <View style={styles.topLeftPlate}>
-                <CustomButton
-                  onPressOut={() => {
-                    setMenuModalVisible(true);
-                  }}
-                  buttonStyle={{
-                    height: 40,
-                    width: 40,
-                    backgroundColor: transparent,
-                  }}
-                >
-                  <Feather name="menu" size={30} color={accentColor} />
-                </CustomButton>
-              </View>
-              <View style={styles.topRightPlate}>
-                <CustomButton
-                  onPressOut={() => {
-                    setHiddenState(!hiddenState);
-                  }}
-                  buttonStyle={{
-                    height: 40,
-                    width: 40,
-                    backgroundColor: transparent,
-                  }}
-                >
-                  <Feather
-                    name={hiddenState ? "eye" : "eye-off"}
-                    size={24}
-                    color={accentColor}
-                  />
-                </CustomButton>
-              </View>
-            </LinearGradient>
-            <ControlMenu
-              modalVisibleParent={menuModalVisible}
-              setModalVisibleParent={setMenuModalVisible}
-              hiddenState={hiddenState}
-              setReloading={setReloading}
-            />
-            <ModifyEntryModal
-              setModalVisibleParent={setAddModalVisible}
-              modalVisibleParent={addModalVisible}
-              editable={true}
-              addNew={true}
-              setGlobalReload={setReloading}
-            />
-          </View>
-          <LinearGradient
-            colors={[
-              transparentC,
-              transparentC,
-              ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
-            ]}
-            locations={[0, 0, ...linspace(0, 1, 50)]}
+      {/* <SafeAreaView style={{ flex: 1 }}> */}
+      <View style={{ height: StatusBar.currentHeight }}></View>
+      <View style={{ flex: 1 }}>
+        <ScrollView overScrollMode="always" style={styles.scrollPlate}>
+          <View
             style={{
-              width: "100%",
-              height: 50 * ScaleFactorVert,
-              bottom: 0,
-              position: "absolute",
-              paddingHorizontal: 15 * ScaleFactor,
-              paddingBottom: 10 * ScaleFactor,
-              flexDirection: "row",
+              flex: 1,
+              justifyContent: "flex-start",
               alignItems: "center",
-              justifyContent: "center",
+              // height: 1200,
+              backgroundColor: themeColor,
             }}
           >
-            <CustomButton
-              onPressOut={() => {
-                loginState
-                  ? navigation.navigate("GroupView")
-                  : navigation.navigate("LoginScreen");
-              }}
-              buttonStyle={{
-                height: 60,
-                width: 60,
+            <View style={styles.scrollOffset}></View>
+            <View style={styles.topPlate}>
+              <View style={styles.numberGrid}>
+                <View style={styles.numberPlate}>
+                  <Text style={styles.mainTitle}>Monthly Expenditure</Text>
+                  <Animated.Text
+                    style={{ ...styles.mainAmount, opacity: loadFade }}
+                  >
+                    {hiddenState
+                      ? "***"
+                      : totalSum.toLocaleString(location, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }) +
+                        " " +
+                        config.defaultCurrency}
+                  </Animated.Text>
+                </View>
+                <CustomButton
+                  onPressOut={() => {
+                    // console.log("+ Pressed");
+                    setAddModalVisible(true);
+                  }}
+                  buttonStyle={{
+                    height: 40,
+                    width: 40,
+                    backgroundColor: { transparent },
+                  }}
+                >
+                  <Feather name="plus" size={30} color={accentColor} />
+                </CustomButton>
+              </View>
+              <View style={styles.chartGrid}>
+                <View style={styles.chartPlate}>
+                  <PieAutoPlot
+                    width={DW}
+                    initTagList={tagList}
+                    hiddenState={hiddenState}
+                    loadOpacity={loadFade}
+                    isReloading={isReloading}
+                    setGlobalReload={setReloading}
+                  ></PieAutoPlot>
+                </View>
+              </View>
+            </View>
+            <View style={styles.midBar}>
+              <View style={styles.midLeftPlate}>
+                <Text style={styles.secTitle}>Latest Transactions</Text>
+              </View>
+              <View style={styles.midRightPlate}>
+                <CustomButton
+                  onPressOut={() => {
+                    navigation.navigate("FullList", { mode: "All" });
+                  }}
+                  buttonStyle={{
+                    height: 30,
+                    width: 80,
+                    borderRadius: 20,
+                    backgroundColor: plateColor,
+                    paddingHorizontal: 10,
+                  }}
+                >
+                  <Text style={styles.secText}>See all</Text>
+                </CustomButton>
+              </View>
+            </View>
+            <Animated.View
+              style={{
+                width: "100%",
+                // opacity: loadFade,
+                transform: [{ translateY: loadSlide }],
               }}
             >
-              <MaterialIcons name="people-alt" size={30} color={accentColor} />
-            </CustomButton>
+              {Ldata.map((LatestTransaction: any) => {
+                return (
+                  <InfoTab
+                    onPress={() => {}}
+                    plateStyle={{
+                      paddingHorizontal: 15,
+                      paddingVertical: 5,
+                    }}
+                    item={LatestTransaction}
+                    key={LatestTransaction._id}
+                    hiddenState={hiddenState}
+                    setGlobalReload={setReloading}
+                  ></InfoTab>
+                );
+              })}
+            </Animated.View>
+            <FxList
+              hiddenState={hiddenState}
+              loadSlide={loadSlide}
+              isReloading={isReloading}
+            ></FxList>
+          </View>
+          <View style={{ height: 60 * ScaleFactor }}></View>
+        </ScrollView>
+        <View style={styles.topBarBase}>
+          <LinearGradient
+            colors={[
+              topBarColor,
+              topBarColor,
+              ...transparentFade(topBarColorS, 50, 255),
+            ]}
+            locations={[0, 0, ...linspace(0, 1, 50)]}
+            style={styles.topBar}
+          >
+            <View style={styles.topLeftPlate}>
+              <CustomButton
+                onPressOut={() => {
+                  setMenuModalVisible(true);
+                }}
+                buttonStyle={{
+                  height: 40,
+                  width: 40,
+                  backgroundColor: transparent,
+                }}
+              >
+                <Feather name="menu" size={30} color={accentColor} />
+              </CustomButton>
+            </View>
+            <View style={styles.topRightPlate}>
+              <CustomButton
+                onPressOut={() => {
+                  setHiddenState(!hiddenState);
+                }}
+                buttonStyle={{
+                  height: 40,
+                  width: 40,
+                  backgroundColor: transparent,
+                }}
+              >
+                <Feather
+                  name={hiddenState ? "eye" : "eye-off"}
+                  size={24}
+                  color={accentColor}
+                />
+              </CustomButton>
+            </View>
           </LinearGradient>
+          <ControlMenu
+            modalVisibleParent={menuModalVisible}
+            setModalVisibleParent={setMenuModalVisible}
+            hiddenState={hiddenState}
+            setReloading={setReloading}
+          />
+          <ModifyEntryModal
+            setModalVisibleParent={setAddModalVisible}
+            modalVisibleParent={addModalVisible}
+            editable={true}
+            addNew={true}
+            setGlobalReload={setReloading}
+          />
         </View>
-      </SafeAreaView>
+        <LinearGradient
+          colors={[
+            transparentC,
+            transparentC,
+            ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
+          ]}
+          locations={[0, 0, ...linspace(0, 1, 50)]}
+          style={{
+            width: "100%",
+            height: 50 * ScaleFactorVert,
+            bottom: 0,
+            position: "absolute",
+            paddingHorizontal: 15 * ScaleFactor,
+            paddingBottom: 10 * ScaleFactor,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CustomButton
+            onPressOut={() => {
+              loginState
+                ? navigation.navigate("GroupView")
+                : navigation.navigate("LoginScreen");
+            }}
+            buttonStyle={{
+              height: 60,
+              width: 60,
+            }}
+          >
+            <MaterialIcons name="people-alt" size={30} color={accentColor} />
+          </CustomButton>
+        </LinearGradient>
+      </View>
+      <View style={{ height: "1%" }}></View>
+      {/* </SafeAreaView> */}
       {/* </LinearGradient> */}
     </View>
   );

@@ -5,6 +5,7 @@ import SessionDetails from "@/components/Shared/SessionDetails";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as SQLite from "expo-sqlite";
 import { View } from "react-native";
+import AddGroup from "../components/Shared/AddGroup";
 import GroupView from "../components/Shared/GroupView";
 import SessionView from "../components/Shared/SessionView";
 import FullList from "./FullList";
@@ -197,6 +198,28 @@ export default function RootLayout() {
               options={{
                 headerShown: false,
                 animation: "slide_from_right",
+                transitionSpec: {
+                  open: {
+                    animation: "timing",
+                    config: {
+                      duration: 300, // Faster open animation (150ms)
+                    },
+                  },
+                  close: {
+                    animation: "timing",
+                    config: {
+                      duration: 300, // Slower close animation (500ms)
+                    },
+                  },
+                },
+              }}
+            />
+            <Stack.Screen
+              name="AddGroup"
+              component={AddGroup}
+              options={{
+                headerShown: false,
+                animation: "slide_from_bottom",
                 transitionSpec: {
                   open: {
                     animation: "timing",

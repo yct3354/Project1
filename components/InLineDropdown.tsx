@@ -32,6 +32,7 @@ interface InLineDropdownProps {
   editable: any;
   textStyle: any;
   style: any;
+  buttonStyle?: any;
   dropDirection: "up" | "down";
 }
 
@@ -49,6 +50,7 @@ const InlineDropdown = ({
   list,
   editable,
   style,
+  buttonStyle,
   textStyle,
   dropDirection,
 }: InLineDropdownProps) => {
@@ -124,6 +126,7 @@ const InlineDropdown = ({
         frameStyle={{ flex: 1 }}
         buttonStyle={{
           ...styles.button,
+          ...buttonStyle,
           borderColor: editable ? accentColor : "#FFFFFF80",
           // backgroundColor: "red",
         }}
@@ -174,7 +177,10 @@ const InlineDropdown = ({
             data={list}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
-              <GestureHandlerRootView style={styles.option}>
+              <GestureHandlerRootView
+                style={styles.option}
+                onStartShouldSetResponder={() => true}
+              >
                 <GestureDetector
                   gesture={Gesture.Tap()
                     .maxDuration(25000)
@@ -200,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: plateColor,
     borderRadius: 15,
     // paddingVertical: 3 * ScaleFactor,
-    marginTop: 3 * ScaleFactor,
+    // marginTop: 3 * ScaleFactor,
     paddingHorizontal: 10 * ScaleFactor,
     // paddingHorizontal: 5,
     justifyContent: "center",
