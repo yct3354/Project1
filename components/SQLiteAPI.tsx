@@ -43,13 +43,35 @@ export const AddNewGroup = async (
 
 export const DeleteGroup = async (db: any, groupID: string) => {
   try {
-    await db.runAsync(`DELETE group_id_table WHERE group_id = ?`, [groupID]);
+    await db.runAsync(
+      `DELETE FROM transaction_table  
+      WHERE transaction_table.user_group_id IN 
+      (SELECT user_group_id FROM user_group_id_table WHERE group_id = ?)`,
+      [groupID]
+    );
+  } catch (error) {
+    console.log(error);
+    throw error;
+  } finally {
+    try {
+      await db.runAsync(`DELETE FROM user_group_id_table WHERE group_id = ?`, [
+        groupID,
+      ]);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  try {
+    await db.runAsync(`DELETE FROM group_id_table WHERE group_id = ?`, [
+      groupID,
+    ]);
   } catch (error) {
     console.log(error);
     throw error;
   }
   try {
-    await db.runAsync(`DELETE user_group_id_table WHERE group_id = ?`, [
+    await db.runAsync(`DELETE FROM session_id_table WHERE group_id = ?`, [
       groupID,
     ]);
   } catch (error) {
@@ -380,8 +402,17 @@ export const GetUserGroupSum = async (db: any, user_group_id: any) => {
 export const GetGroupUserNet = async (db: any, group_id: any) => {
   try {
     return await db.getAllAsync(
-      `SELECT user_group_id_table.emoji, user_group_id_table.group_id, user_group_id_table.user_group_id, user_group_id_table.user_group_name, SUM(transaction_table.amount*transaction_table.rate*(transaction_table.payer_payee*2-1)) AS net ` +
-        `FROM transaction_table JOIN user_group_id_table ON transaction_table.user_group_id = user_group_id_table.user_group_id AND user_group_id_table.group_id = ? GROUP BY user_group_id_table.user_group_id ORDER BY user_group_id_table.user_group_name ASC`,
+      `SELECT 
+        user_group_id_table.emoji, 
+        user_group_id_table.group_id, 
+        user_group_id_table.user_group_id, 
+        user_group_id_table.user_group_name, 
+        COALESCE(SUM(transaction_table.amount*transaction_table.rate*(transaction_table.payer_payee*2-1)),0) AS net 
+        FROM transaction_table 
+        RIGHT JOIN user_group_id_table ON transaction_table.user_group_id = user_group_id_table.user_group_id 
+        WHERE user_group_id_table.group_id = ? 
+        GROUP BY user_group_id_table.user_group_id 
+        ORDER BY user_group_id_table.user_group_name ASC`,
       [group_id]
     );
   } catch (error) {

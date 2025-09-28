@@ -237,40 +237,32 @@ export default function SessionDetails({ route }: any) {
                 color={accentColor}
               />
             </CustomButton>
-            <CustomButton
-              onPressOut={() => {
-                // navigation.goBack();
-              }}
-              frameStyle={{
+            <View
+              style={{
                 flex: 1,
                 flexDirection: "row",
                 justifyContent: "flex-end",
-                // backgroundColor: "red",
-              }}
-              buttonStyle={{
-                height: 40 * ScaleFactor,
-                width: 40 * ScaleFactor,
-                borderRadius: 20,
-                // backgroundColor: plateColor,
               }}
             >
-              <Feather
-                name="trash-2"
-                size={30 * ScaleFactor}
-                color={"#FF3B30"}
-              />
-            </CustomButton>
+              <CustomButton
+                onPressOut={() => {
+                  // navigation.goBack();
+                }}
+                frameStyle={{}}
+                buttonStyle={{
+                  height: 40 * ScaleFactor,
+                  width: 40 * ScaleFactor,
+                  borderRadius: 20,
+                }}
+              >
+                <Feather
+                  name="trash-2"
+                  size={30 * ScaleFactor}
+                  color={"#FF3B30"}
+                />
+              </CustomButton>
+            </View>
           </View>
-          {/* <CustomButton
-              buttonStyle={{
-                width: 40 * ScaleFactor,
-                height: 40 * ScaleFactor,
-                backgroundColor: plateColor,
-              }}
-              onPressOut={() => setEmojiKeyboardOpen(true)}
-            >
-              <Text>{emojiDictionary.getUnicode(emoji)}</Text>
-            </CustomButton> */}
           <View
             style={{
               paddingBottom: 20 * ScaleFactor,

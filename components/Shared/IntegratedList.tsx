@@ -2,7 +2,7 @@ import IntegratedTab from "@/components/Shared/IntegratedTab";
 import { LinearGradient } from "expo-linear-gradient";
 import { ColorValue, Dimensions } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
-import TransactionEmpty from "./TransactionEmpty";
+import EmptyListAnimated from "./EmptyListAnimated";
 
 const DW = Dimensions.get("window").width;
 const DH = Dimensions.get("window").height;
@@ -94,7 +94,9 @@ IntegratedListProps) {
           />
         )}
         itemLayoutAnimation={LinearTransition}
-        ListEmptyComponent={<TransactionEmpty />}
+        ListEmptyComponent={
+          <EmptyListAnimated text={"No Outstanding Transactions!"} />
+        }
       ></Animated.FlatList>
       <LinearGradient
         colors={[

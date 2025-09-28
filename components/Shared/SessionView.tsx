@@ -1,4 +1,5 @@
 import config from "@/components/config.json";
+import { ConfirmState } from "@/components/ConfirmProvider";
 import CustomButton from "@/components/customButton";
 import SessionTab from "@/components/Shared/SessionTab";
 import * as SQLiteAPI from "@/components/SQLiteAPI";
@@ -7,7 +8,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Animated,
   ColorValue,
@@ -19,6 +20,8 @@ import {
   View,
 } from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
+import ConfirmDeleteModal from "../ConfirmDeleteModal";
+import EmptyListAnimated from "./EmptyListAnimated";
 import UserBalance from "./UserBalance";
 
 const DW = Dimensions.get("window").width;
@@ -72,6 +75,7 @@ export default function SessionView({ route }: any) {
   const navigation = useNavigation<any>();
   const db = useSQLiteContext();
   const { group_id, user_group_id, group_name } = route.params;
+  const { confirmState, setConfirmState } = useContext(ConfirmState);
 
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -126,7 +130,20 @@ export default function SessionView({ route }: any) {
       ...tempNet.filter((item: any) => item.user_group_id != user_group_id),
     ]);
     setTagList(tempTag);
+    // console.log(tempNet);
     setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await SQLiteAPI.DeleteGroup(db, group_id);
+      // console.log("Deleting");
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      navigation.goBack();
+    }
   };
 
   const FadeIn = () => {
@@ -179,432 +196,457 @@ export default function SessionView({ route }: any) {
       locations={[0.5, 0.5]}
       style={{ flex: 1 }}
     >
-      <LinearGradient
-        colors={[
-          topBarColor,
-          topBarColor,
-          ...transparentFade(topBarColorS, 50, 255),
-        ]}
-        locations={[0, 0, ...linspace(0, 1, 50)]}
-        style={styles.topBar}
-      ></LinearGradient>
-      {/* <SafeAreaView style={{ flex: 1 }}> */}
-      <View style={{ height: StatusBar.currentHeight }}></View>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: themeColor,
-          alignItems: "center",
-          justifyContent: "center",
-
-          overflow: "hidden",
-          width: "100%",
-        }}
-      >
+      <View style={{ height: "100%" }}>
+        <LinearGradient
+          colors={[
+            topBarColor,
+            topBarColor,
+            ...transparentFade(topBarColorS, 50, 255),
+          ]}
+          locations={[0, 0, ...linspace(0, 1, 50)]}
+          style={styles.topBar}
+        ></LinearGradient>
+        {/* <SafeAreaView style={{ flex: 1 }}> */}
+        <View style={{ height: StatusBar.currentHeight }}></View>
         <View
           style={{
-            backgroundColor: themeColor,
             flex: 1,
+            backgroundColor: themeColor,
+            alignItems: "center",
+            justifyContent: "center",
+
+            overflow: "hidden",
+            width: "100%",
           }}
         >
-          <Animated.View style={{ opacity: loadFade, minHeight: "13%" }}>
-            <View style={styles.titlePlate}>
-              <Text style={{ ...styles.sumText, paddingTop: 10 * ScaleFactor }}>
-                {emojiDictionary.getUnicode(groupInfo.emoji || " ")}
-              </Text>
-              <Text style={{ ...styles.sumText, paddingTop: 5 * ScaleFactor }}>
-                {groupInfo.group_name || " "}
-              </Text>
+          <View
+            style={{
+              backgroundColor: themeColor,
+              flex: 1,
+            }}
+          >
+            <Animated.View style={{ opacity: loadFade, minHeight: "13%" }}>
+              <View style={styles.titlePlate}>
+                <Text
+                  style={{ ...styles.sumText, paddingTop: 10 * ScaleFactor }}
+                >
+                  {emojiDictionary.getUnicode(groupInfo.emoji || " ")}
+                </Text>
+                <Text
+                  style={{ ...styles.sumText, paddingTop: 5 * ScaleFactor }}
+                >
+                  {groupInfo.group_name || " "}
+                </Text>
+              </View>
+            </Animated.View>
+            <View>
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  marginBottom: 10 * ScaleFactor,
+                  minHeight: "18%",
+                }}
+              >
+                <Animated.View
+                  style={{ ...styles.topLeftPlate, opacity: loadFade }}
+                >
+                  <View style={styles.amountPlate}>
+                    <Text style={styles.secText}>{"Your Expenditure"}</Text>
+                    <Text style={styles.sumText}>
+                      {userSum.toLocaleString(location, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) +
+                        " " +
+                        config.defaultCurrency}
+                    </Text>
+                  </View>
+                  <View style={styles.amountPlate}>
+                    <Text style={styles.secText}>{"Group Expenditure"}</Text>
+                    <Text style={styles.sumText}>
+                      {groupSum.toLocaleString(location, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) +
+                        " " +
+                        config.defaultCurrency}
+                    </Text>
+                  </View>
+                </Animated.View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    paddingHorizontal: 20 * ScaleFactor,
+                  }}
+                >
+                  <View style={{ justifyContent: "flex-end" }}>
+                    <CustomButton
+                      onPressOut={() => {
+                        // navigation.goBack();
+                      }}
+                      frameStyle={{
+                        marginVertical: 2 * ScaleFactor,
+                        marginRight: 0 * ScaleFactor,
+                      }}
+                      buttonStyle={{
+                        height: 40 * ScaleFactor,
+                        width: 40 * ScaleFactor,
+                        borderRadius: 23,
+                        // backgroundColor: plateColor,
+                      }}
+                    >
+                      <MaterialIcons
+                        name="insights"
+                        size={30 * ScaleFactor}
+                        color={accentColor}
+                      />
+                    </CustomButton>
+                    <CustomButton
+                      onPressOut={() => {
+                        // navigation.goBack();
+                      }}
+                      frameStyle={{
+                        marginVertical: 2 * ScaleFactor,
+                        marginRight: 2 * ScaleFactor,
+                      }}
+                      buttonStyle={{
+                        height: 40 * ScaleFactor,
+                        width: 40 * ScaleFactor,
+                        borderRadius: 23,
+                        // backgroundColor: plateColor,
+                      }}
+                    >
+                      <MaterialIcons
+                        name="person-add"
+                        size={30 * ScaleFactor}
+                        color={accentColor}
+                      />
+                    </CustomButton>
+                    <CustomButton
+                      onPressOut={() => {
+                        // navigation.goBack();
+                      }}
+                      frameStyle={{
+                        marginVertical: 2 * ScaleFactor,
+                        marginRight: 0 * ScaleFactor,
+                      }}
+                      buttonStyle={{
+                        height: 40 * ScaleFactor,
+                        width: 40 * ScaleFactor,
+                        borderRadius: 23,
+                        // backgroundColor: plateColor,
+                      }}
+                    >
+                      <Feather
+                        name="edit-2"
+                        size={30 * ScaleFactor}
+                        color={accentColor}
+                      />
+                    </CustomButton>
+                  </View>
+                </View>
+              </View>
+              <View style={{ height: 40 * ScaleFactor, width: "100%" }}>
+                <View
+                  style={{ justifyContent: "center", alignItems: "center" }}
+                >
+                  <View
+                    style={{
+                      width: slideBarRange * 2 * ScaleFactor,
+                      borderRadius: 22,
+                      borderWidth: 2,
+                      borderColor: plateColor,
+                      overflow: "hidden",
+                      height: "100%",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Animated.View
+                      style={{
+                        backgroundColor: accentColor,
+                        // backgroundColor: "#EDCA40",
+                        width: slideBarRange * ScaleFactor,
+                        borderBottomLeftRadius: leftBorderRadius,
+                        borderTopLeftRadius: leftBorderRadius,
+                        borderBottomRightRadius: rightBorderRadius,
+                        borderTopRightRadius: rightBorderRadius,
+                        height: "100%",
+                        transform: [{ translateX: scrollProgress }],
+                      }}
+                    ></Animated.View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        scrollRef?.current?.scrollTo({ animated: true, x: 0 })
+                      }
+                      style={{
+                        width: "50%",
+                        position: "absolute",
+                        height: "100%",
+                        left: "0%",
+                        top: "0%",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Animated.Text
+                        style={{
+                          color: leftText,
+                          fontWeight: "500",
+                          fontSize: 17 * ScaleFactor,
+                        }}
+                      >
+                        {"Transactions"}
+                      </Animated.Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() =>
+                        scrollRef?.current?.scrollTo({ animated: true, x: DW })
+                      }
+                      style={{
+                        width: "50%",
+                        position: "absolute",
+                        height: "100%",
+                        left: "50%",
+                        top: "0%",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Animated.Text
+                        style={{
+                          color: rightText,
+                          fontWeight: "500",
+                          fontSize: 17 * ScaleFactor,
+                        }}
+                      >
+                        {"Balance"}
+                      </Animated.Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
             </View>
-          </Animated.View>
-          <View>
+            <Animated.View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                width: DW,
+                opacity: loadFade,
+                // backgroundColor: "red",
+              }}
+            >
+              <ScrollView
+                horizontal={true}
+                ref={scrollRef}
+                style={{ width: "100%" }}
+                snapToInterval={DW}
+                onScroll={(event) => {
+                  scrollProgress.setValue(
+                    (event.nativeEvent.contentOffset.x / DW) *
+                      slideBarRange *
+                      ScaleFactor
+                  );
+                }}
+                decelerationRate={0.92}
+              >
+                <View style={{ width: DW }}>
+                  <FlatList
+                    data={sessionTable}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item }: any) => (
+                      <SessionTab
+                        item={item}
+                        sessionID={item.session_id}
+                        user_group_id={user_group_id}
+                        tagList={tagList}
+                      />
+                    )}
+                    ListHeaderComponent={
+                      <View
+                        style={{ width: "100%", height: 10 * ScaleFactor }}
+                      ></View>
+                    }
+                    ListFooterComponent={
+                      <View
+                        style={{ width: "100%", height: 120 * ScaleFactorVert }}
+                      ></View>
+                    }
+                    ListEmptyComponent={
+                      <EmptyListAnimated text={"No Transactions Yet!"} />
+                    }
+                  ></FlatList>
+                </View>
+                <View style={{ width: DW }}>
+                  <FlatList
+                    data={userNet}
+                    // style={{ width: "90%" }}
+                    renderItem={({ item }: any) => (
+                      <UserBalance
+                        item={item}
+                        self={
+                          item.user_group_id === user_group_id ? true : false
+                        }
+                      />
+                    )}
+                    ListHeaderComponent={
+                      <View
+                        style={{ width: "100%", height: 10 * ScaleFactor }}
+                      ></View>
+                    }
+                    ListFooterComponent={
+                      <View
+                        style={{ width: "100%", height: 120 * ScaleFactorVert }}
+                      ></View>
+                    }
+                  ></FlatList>
+                </View>
+              </ScrollView>
+              <LinearGradient
+                colors={[
+                  transparentC,
+                  transparentC,
+                  ...[...transparentFade(themeColor, 50, 255)].reverse(),
+                ]}
+                locations={[0, 0, ...linspace(0, 1, 50)]}
+                start={[0, 1]}
+                end={[0, 0]}
+                style={{
+                  width: "100%",
+                  height: 20 * ScaleFactor,
+                  position: "absolute",
+                  top: "0%",
+                }}
+              ></LinearGradient>
+            </Animated.View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                // padding: 5 * ScaleFactor,
+                position: "absolute",
+                right: "3%",
+                bottom: "5%",
+              }}
+            >
+              <CustomButton
+                onPressOut={() => {
+                  navigation.navigate("AddSession", {
+                    group_id: group_id,
+                    user_group_id: user_group_id,
+                  });
+                }}
+                frameStyle={{ padding: 10 * ScaleFactor }}
+                buttonStyle={{
+                  height: 54,
+                  width: 54,
+                  backgroundColor: plateColor,
+                  elevation: 5,
+                }}
+              >
+                <Feather name="plus" size={36} color={accentColor} />
+              </CustomButton>
+            </View>
+            <LinearGradient
+              colors={[
+                transparentC,
+                transparentC,
+                ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
+              ]}
+              locations={[0, 0, ...linspace(0, 1, 50)]}
+              style={{
+                width: "100%",
+                height: 50 * ScaleFactorVert,
+                bottom: 0,
+                position: "absolute",
+                paddingHorizontal: 15 * ScaleFactor,
+                paddingBottom: 10 * ScaleFactor,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CustomButton
+                onPressOut={() => {
+                  navigation.popToTop();
+                }}
+                buttonStyle={{
+                  height: 60,
+                  width: 60,
+                }}
+              >
+                <MaterialIcons name="person" size={30} color={accentColor} />
+              </CustomButton>
+            </LinearGradient>
             <View
               style={{
                 width: "100%",
+                paddingHorizontal: 20 * ScaleFactor,
+                paddingTop: 15 * ScaleFactor,
                 flexDirection: "row",
-                marginBottom: 10 * ScaleFactor,
-                minHeight: "18%",
+                position: "absolute",
+                // top:'0%'
               }}
             >
-              <Animated.View
-                style={{ ...styles.topLeftPlate, opacity: loadFade }}
+              <CustomButton
+                onPressOut={() => {
+                  navigation.goBack();
+                }}
+                buttonStyle={{
+                  height: 40 * ScaleFactor,
+                  width: 40 * ScaleFactor,
+                  borderRadius: 20,
+                  backgroundColor: plateColor,
+                }}
               >
-                <View style={styles.amountPlate}>
-                  <Text style={styles.secText}>{"Your Expenditure"}</Text>
-                  <Text style={styles.sumText}>
-                    {userSum.toLocaleString(location, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }) +
-                      " " +
-                      config.defaultCurrency}
-                  </Text>
-                </View>
-                <View style={styles.amountPlate}>
-                  <Text style={styles.secText}>{"Group Expenditure"}</Text>
-                  <Text style={styles.sumText}>
-                    {groupSum.toLocaleString(location, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }) +
-                      " " +
-                      config.defaultCurrency}
-                  </Text>
-                </View>
-              </Animated.View>
+                <Feather
+                  name="arrow-left"
+                  size={24 * ScaleFactor}
+                  color={accentColor}
+                />
+              </CustomButton>
               <View
                 style={{
                   flex: 1,
                   flexDirection: "row",
                   justifyContent: "flex-end",
-                  paddingHorizontal: 20 * ScaleFactor,
+                  // backgroundColor: "red",
                 }}
               >
-                <View style={{ justifyContent: "flex-end" }}>
-                  <CustomButton
-                    onPressOut={() => {
-                      // navigation.goBack();
-                    }}
-                    frameStyle={{
-                      marginVertical: 2 * ScaleFactor,
-                      marginRight: 0 * ScaleFactor,
-                    }}
-                    buttonStyle={{
-                      height: 40 * ScaleFactor,
-                      width: 40 * ScaleFactor,
-                      borderRadius: 23,
-                      // backgroundColor: plateColor,
-                    }}
-                  >
-                    <MaterialIcons
-                      name="insights"
-                      size={30 * ScaleFactor}
-                      color={accentColor}
-                    />
-                  </CustomButton>
-                  <CustomButton
-                    onPressOut={() => {
-                      // navigation.goBack();
-                    }}
-                    frameStyle={{
-                      marginVertical: 2 * ScaleFactor,
-                      marginRight: 2 * ScaleFactor,
-                    }}
-                    buttonStyle={{
-                      height: 40 * ScaleFactor,
-                      width: 40 * ScaleFactor,
-                      borderRadius: 23,
-                      // backgroundColor: plateColor,
-                    }}
-                  >
-                    <MaterialIcons
-                      name="person-add"
-                      size={30 * ScaleFactor}
-                      color={accentColor}
-                    />
-                  </CustomButton>
-                  <CustomButton
-                    onPressOut={() => {
-                      // navigation.goBack();
-                    }}
-                    frameStyle={{
-                      marginVertical: 2 * ScaleFactor,
-                      marginRight: 0 * ScaleFactor,
-                    }}
-                    buttonStyle={{
-                      height: 40 * ScaleFactor,
-                      width: 40 * ScaleFactor,
-                      borderRadius: 23,
-                      // backgroundColor: plateColor,
-                    }}
-                  >
-                    <Feather
-                      name="edit-2"
-                      size={30 * ScaleFactor}
-                      color={accentColor}
-                    />
-                  </CustomButton>
-                </View>
-              </View>
-            </View>
-            <View style={{ height: 40 * ScaleFactor, width: "100%" }}>
-              <View style={{ justifyContent: "center", alignItems: "center" }}>
-                <View
-                  style={{
-                    width: slideBarRange * 2 * ScaleFactor,
-                    borderRadius: 22,
-                    borderWidth: 2,
-                    borderColor: plateColor,
-                    overflow: "hidden",
-                    height: "100%",
-                    justifyContent: "center",
+                <CustomButton
+                  onPressOut={() => {
+                    setConfirmState(true);
+                  }}
+                  frameStyle={{}}
+                  buttonStyle={{
+                    height: 40 * ScaleFactor,
+                    width: 40 * ScaleFactor,
+                    borderRadius: 20,
+                    // backgroundColor: plateColor,
                   }}
                 >
-                  <Animated.View
-                    style={{
-                      backgroundColor: accentColor,
-                      // backgroundColor: "#EDCA40",
-                      width: slideBarRange * ScaleFactor,
-                      borderBottomLeftRadius: leftBorderRadius,
-                      borderTopLeftRadius: leftBorderRadius,
-                      borderBottomRightRadius: rightBorderRadius,
-                      borderTopRightRadius: rightBorderRadius,
-                      height: "100%",
-                      transform: [{ translateX: scrollProgress }],
-                    }}
-                  ></Animated.View>
-                  <TouchableOpacity
-                    onPress={() =>
-                      scrollRef?.current?.scrollTo({ animated: true, x: 0 })
-                    }
-                    style={{
-                      width: "50%",
-                      position: "absolute",
-                      height: "100%",
-                      left: "0%",
-                      top: "0%",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Animated.Text
-                      style={{
-                        color: leftText,
-                        fontWeight: "500",
-                        fontSize: 17 * ScaleFactor,
-                      }}
-                    >
-                      {"Transactions"}
-                    </Animated.Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() =>
-                      scrollRef?.current?.scrollTo({ animated: true, x: DW })
-                    }
-                    style={{
-                      width: "50%",
-                      position: "absolute",
-                      height: "100%",
-                      left: "50%",
-                      top: "0%",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Animated.Text
-                      style={{
-                        color: rightText,
-                        fontWeight: "500",
-                        fontSize: 17 * ScaleFactor,
-                      }}
-                    >
-                      {"Balance"}
-                    </Animated.Text>
-                  </TouchableOpacity>
-                </View>
+                  <Feather
+                    name="trash-2"
+                    size={30 * ScaleFactor}
+                    color={"#FF3B30"}
+                  />
+                </CustomButton>
               </View>
             </View>
           </View>
-          <Animated.View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-              width: DW,
-              opacity: loadFade,
-              // backgroundColor: "red",
-            }}
-          >
-            <ScrollView
-              horizontal={true}
-              ref={scrollRef}
-              style={{ width: "100%" }}
-              snapToInterval={DW}
-              onScroll={(event) => {
-                scrollProgress.setValue(
-                  (event.nativeEvent.contentOffset.x / DW) *
-                    slideBarRange *
-                    ScaleFactor
-                );
-              }}
-              decelerationRate={0.92}
-            >
-              <View style={{ width: DW }}>
-                <FlatList
-                  data={sessionTable}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item }: any) => (
-                    <SessionTab
-                      item={item}
-                      sessionID={item.session_id}
-                      user_group_id={user_group_id}
-                      tagList={tagList}
-                    />
-                  )}
-                  ListHeaderComponent={
-                    <View
-                      style={{ width: "100%", height: 10 * ScaleFactor }}
-                    ></View>
-                  }
-                  ListFooterComponent={
-                    <View
-                      style={{ width: "100%", height: 120 * ScaleFactorVert }}
-                    ></View>
-                  }
-                ></FlatList>
-              </View>
-              <View style={{ width: DW }}>
-                <FlatList
-                  data={userNet}
-                  // style={{ width: "90%" }}
-                  renderItem={({ item }: any) => (
-                    <UserBalance
-                      item={item}
-                      self={item.user_group_id === user_group_id ? true : false}
-                    />
-                  )}
-                  ListHeaderComponent={
-                    <View
-                      style={{ width: "100%", height: 10 * ScaleFactor }}
-                    ></View>
-                  }
-                  ListFooterComponent={
-                    <View
-                      style={{ width: "100%", height: 120 * ScaleFactorVert }}
-                    ></View>
-                  }
-                ></FlatList>
-              </View>
-            </ScrollView>
-            <LinearGradient
-              colors={[
-                transparentC,
-                transparentC,
-                ...[...transparentFade(themeColor, 50, 255)].reverse(),
-              ]}
-              locations={[0, 0, ...linspace(0, 1, 50)]}
-              start={[0, 1]}
-              end={[0, 0]}
-              style={{
-                width: "100%",
-                height: 20 * ScaleFactor,
-                position: "absolute",
-                top: "0%",
-              }}
-            ></LinearGradient>
-          </Animated.View>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              // padding: 5 * ScaleFactor,
-              position: "absolute",
-              right: "3%",
-              bottom: "5%",
-            }}
-          >
-            <CustomButton
-              onPressOut={() => {
-                // navigation.popToTop();
-              }}
-              frameStyle={{ padding: 10 * ScaleFactor }}
-              buttonStyle={{
-                height: 54,
-                width: 54,
-                backgroundColor: plateColor,
-                elevation: 5,
-              }}
-            >
-              <Feather name="plus" size={36} color={accentColor} />
-            </CustomButton>
-          </View>
-          <LinearGradient
-            colors={[
-              transparentC,
-              transparentC,
-              ...[...transparentFade(topBarColorS, 50, 255)].reverse(),
-            ]}
-            locations={[0, 0, ...linspace(0, 1, 50)]}
-            style={{
-              width: "100%",
-              height: 50 * ScaleFactorVert,
-              bottom: 0,
-              position: "absolute",
-              paddingHorizontal: 15 * ScaleFactor,
-              paddingBottom: 10 * ScaleFactor,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CustomButton
-              onPressOut={() => {
-                navigation.popToTop();
-              }}
-              buttonStyle={{
-                height: 60,
-                width: 60,
-              }}
-            >
-              <MaterialIcons name="person" size={30} color={accentColor} />
-            </CustomButton>
-          </LinearGradient>
-          <View
-            style={{
-              width: "100%",
-              paddingHorizontal: 20 * ScaleFactor,
-              paddingTop: 15 * ScaleFactor,
-              flexDirection: "row",
-              position: "absolute",
-              // top:'0%'
-            }}
-          >
-            <CustomButton
-              onPressOut={() => {
-                navigation.goBack();
-              }}
-              buttonStyle={{
-                height: 40 * ScaleFactor,
-                width: 40 * ScaleFactor,
-                borderRadius: 20,
-                backgroundColor: plateColor,
-              }}
-            >
-              <Feather
-                name="arrow-left"
-                size={24 * ScaleFactor}
-                color={accentColor}
-              />
-            </CustomButton>
-            <CustomButton
-              onPressOut={() => {
-                // navigation.goBack();
-              }}
-              frameStyle={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                // backgroundColor: "red",
-              }}
-              buttonStyle={{
-                height: 40 * ScaleFactor,
-                width: 40 * ScaleFactor,
-                borderRadius: 20,
-                // backgroundColor: plateColor,
-              }}
-            >
-              <Feather
-                name="trash-2"
-                size={30 * ScaleFactor}
-                color={"#FF3B30"}
-              />
-            </CustomButton>
-          </View>
         </View>
+        <View style={{ height: "1%" }}></View>
+        {/* </SafeAreaView> */}
       </View>
-      <View style={{ height: "1%" }}></View>
-      {/* </SafeAreaView> */}
+      <ConfirmDeleteModal
+        onConfirm={handleDelete}
+        onCancel={() => {}}
+        text={"Delete " + groupInfo.group_name + " ?"}
+      />
     </LinearGradient>
   );
 }

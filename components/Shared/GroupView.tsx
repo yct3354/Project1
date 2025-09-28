@@ -2,10 +2,10 @@ import CustomButton from "@/components/customButton";
 import * as SQLiteAPI from "@/components/SQLiteAPI";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   ColorValue,
@@ -105,87 +105,6 @@ export default function GroupView() {
     });
   };
 
-  // const InsertUserGroup = async () => {
-  //   try {
-  //     await db.runAsync(
-  //       `INSERT INTO user_group_id_table (group_id , timeStamp, user_group_id, user_group_name, user_id) VALUES  (?,?,?,?,?)`,
-  //       [
-  //         "74bbbe9e-68d6-40d4-ad13-0a41727c8a62",
-  //         1757349756,
-  //         "e8e4508c-dafc-4fc0-84d7-39a7c8e15061",
-  //         "Zaire",
-  //         "af1ae796-b3b4-40d2-9353-a2c14fc894a1",
-  //       ]
-  //     );
-  //     fetchData();
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // };
-
-  // const ChangeUserGroup = async () => {
-  //   try {
-  //     await db.runAsync(
-  //       `UPDATE user_group_id_table SET group_id = ?, timeStamp = ?, user_group_id = ?, user_group_name = ?, user_id = ?`,
-  //       [
-  //         "74bbbe9e-68d6-40d4-ad13-0a41727c8a62",
-  //         1757349750,
-  //         "e8e4508c-dafc-4fc0-84d7-39a7c8e15001",
-  //         "Zaire",
-  //         "af1ae796-b3b4-40d2-9353-a2c14fc894a1",
-  //       ]
-  //     );
-  //     fetchData();
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // };
-
-  // const syncAll = async () => {
-  //   const delta: any = await ServerAPI.obtainDelta(
-  //     groupTable,
-  //     userGroupTable,
-  //     sessionTable,
-  //     transactionTable
-  //   );
-  //   // console.log(delta.user_group_id_table.add);
-  //   try {
-  //     await SQLiteAPI.UpdateUserGroup(db, delta.user_group_id_table.update);
-  //     await SQLiteAPI.AddUserGroup(db, delta.user_group_id_table.add);
-  //     await SQLiteAPI.RemoveUserGroup(db, delta.user_group_id_table.remove);
-  //     await SQLiteAPI.UpdateGroup(db, delta.group_id_table.update);
-  //     await SQLiteAPI.AddGroup(db, delta.group_id_table.add);
-  //     await SQLiteAPI.RemoveGroup(db, delta.group_id_table.remove);
-  //     await SQLiteAPI.UpdateSession(db, delta.session_id_table.update);
-  //     await SQLiteAPI.AddSession(db, delta.session_id_table.add);
-  //     await SQLiteAPI.RemoveSession(db, delta.session_id_table.remove);
-  //     await SQLiteAPI.UpdateTransaction(db, delta.transaction_table.update);
-  //     await SQLiteAPI.AddTransaction(db, delta.transaction_table.add);
-  //     await SQLiteAPI.RemoveTransaction(db, delta.transaction_id_table.remove);
-  //   } catch (error) {
-  //   } finally {
-  //     setRefreshing(false);
-  //   }
-  // };
-
-  // const ViewUserGroup = async () => {
-  //   const tableA: any = await GetUserGroup();
-  //   const tableB: any = await GetGroup();
-  //   const tableC: any = await GetSessions();
-  //   const tableD: any = await GetTransactions();
-  //   setUserGroupTable(tableA);
-  //   setGroupTable(tableB);
-  //   setSessionTable(tableC);
-  //   setTransactionTable(tableD);
-  //   console.log(tableC.length);
-  // };
-
-  // const clearData = async () => {
-  //   await ClearAll();
-  // };
-
   const FadeIn = () => {
     Animated.timing(loadFade, {
       toValue: 1,
@@ -195,15 +114,15 @@ export default function GroupView() {
       useNativeDriver: true,
     }).start();
   };
-  // const FadeOut = () => {
-  //   Animated.timing(loadFade, {
-  //     toValue: 0,
-  //     // delay: 5,
-  //     duration: 300,
-  //     // easing: Easing.out(Easing.exp),
-  //     useNativeDriver: true,
-  //   }).start(() => {});
-  // };
+  const FadeOut = () => {
+    Animated.timing(loadFade, {
+      toValue: 0,
+      // delay: 5,
+      duration: 300,
+      // easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start(() => {});
+  };
 
   useEffect(() => {
     fetchData();
@@ -231,6 +150,16 @@ export default function GroupView() {
       FadeIn();
     }
   }, [listLoaded]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      return () => {
+        FadeOut();
+        setListLoaded(false);
+      };
+    }, [])
+  );
 
   return (
     <LinearGradient

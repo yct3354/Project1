@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
+  Animated,
   ColorValue,
   Dimensions,
-  Animated,
   Easing,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
-import { useSQLiteContext } from "expo-sqlite";
-import Feather from "@expo/vector-icons/Feather";
 import CustomButton from "@/components/customButton";
+import Feather from "@expo/vector-icons/Feather";
+import { useSQLiteContext } from "expo-sqlite";
 import {
   Gesture,
   GestureDetector,
@@ -34,6 +34,10 @@ interface InLineDropdownProps {
   style: any;
   buttonStyle?: any;
   dropDirection: "up" | "down";
+  scrollEnabled?: boolean;
+  dropDownLocation?: any;
+  dropdownStyle?: any;
+  dropdownOffset?: number;
 }
 
 const accentColor = "#EFBF04"; //9D00FF, FF8000
@@ -53,6 +57,10 @@ const InlineDropdown = ({
   buttonStyle,
   textStyle,
   dropDirection,
+  scrollEnabled = true,
+  dropDownLocation = "100%",
+  dropdownStyle,
+  dropdownOffset = 50,
 }: InLineDropdownProps) => {
   const db = useSQLiteContext();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -71,7 +79,7 @@ const InlineDropdown = ({
   });
   const loadSlide = loadRoll.interpolate({
     inputRange: [0, 1],
-    outputRange: [dropDirection === "up" ? 50 : -50, 0],
+    outputRange: [dropDirection === "up" ? dropdownOffset : -dropdownOffset, 0],
   });
 
   const RollIn = () => {
@@ -79,6 +87,7 @@ const InlineDropdown = ({
       toValue: 1,
       // delay: 5,
       duration: 300,
+      // duration: 2000,
       easing: Easing.out(Easing.exp),
       useNativeDriver: true,
     }).start();
@@ -89,6 +98,7 @@ const InlineDropdown = ({
       toValue: 0,
       // delay: 5,
       duration: 300,
+      // duration: 2000,
       easing: Easing.out(Easing.exp),
       useNativeDriver: true,
     }).start(() => {
@@ -97,19 +107,11 @@ const InlineDropdown = ({
   };
 
   const dropDownStyle = StyleSheet.create({
-    style: dropDirection === "up" ? { bottom: "100%" } : { top: "100%" },
+    style:
+      dropDirection === "up"
+        ? { bottom: dropDownLocation }
+        : { top: dropDownLocation },
   });
-
-  const GetUnique = async () => {
-    try {
-      return await db.getAllAsync(
-        `SELECT DISTINCT tag FROM record WHERE tag <> "Foreign Exchange"`
-      );
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
 
   const toggleDropdown = () => {
     if (!isDropdownVisible) {
@@ -158,6 +160,7 @@ const InlineDropdown = ({
             borderRadius: loadBorder,
             ...dropDownStyle.style,
             maxHeight: DH * 0.25,
+            ...dropdownStyle,
             transform: [
               {
                 translateY: loadSlide,
@@ -175,6 +178,7 @@ const InlineDropdown = ({
         >
           <FlatList
             data={list}
+            scrollEnabled={scrollEnabled}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <GestureHandlerRootView

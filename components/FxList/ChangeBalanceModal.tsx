@@ -1,26 +1,25 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  Pressable,
-  Text,
-  StyleSheet,
-  View,
   Animated,
   ColorValue,
   Dimensions,
-  Modal,
-  TextInput,
   Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
-import fxRef from "@/data/fxRef.json";
-import { fxIndexMap } from "@/components/fxIndexMap";
+import config from "@/components/config.json";
 import CustomButton from "@/components/customButton";
+import { fxIndexMap } from "@/components/fxIndexMap";
 import images from "@/components/Images";
-import Feather from "@expo/vector-icons/Feather";
+import fxRef from "@/data/fxRef.json";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
 import { useSQLiteContext } from "expo-sqlite";
 import uuid from "react-native-uuid";
-import config from "@/components/config.json";
 
 /**
  * Parse a localized number to a float.
@@ -432,7 +431,9 @@ export default function ChangeBalanceModal({
                         maxWidth: 151 * ScaleFactor,
                       }}
                     >
-                      <Text style={styles.midText}>{"Final Balance:"}</Text>
+                      <Text style={styles.midText} numberOfLines={1}>
+                        {"Final Balance:"}
+                      </Text>
                       <Text
                         style={{
                           ...styles.midAmountText,
@@ -465,7 +466,9 @@ export default function ChangeBalanceModal({
                         maxWidth: 151 * ScaleFactor,
                       }}
                     >
-                      <Text style={styles.midText}>{"Final Balance:"}</Text>
+                      <Text style={styles.midText} numberOfLines={1}>
+                        {"Final Balance:"}
+                      </Text>
                       <Text
                         style={{
                           ...styles.midAmountText,
@@ -718,7 +721,7 @@ const styles = StyleSheet.create({
   },
   midText: {
     color: "white",
-    fontSize: 20 * ScaleFactor,
+    fontSize: 19 * ScaleFactor,
     fontWeight: "bold",
     textAlign: "right",
     textAlignVertical: "center",

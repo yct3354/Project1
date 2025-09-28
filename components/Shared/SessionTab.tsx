@@ -1,6 +1,6 @@
 import config from "@/components/config.json";
 import { useNavigation } from "expo-router";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import {
   Animated,
   ColorValue,
@@ -72,7 +72,7 @@ function getDateString(datePreParse: string) {
   );
 }
 
-export default function SessionTab({
+function SessionTab({
   item,
   sessionID,
   user_group_id,
@@ -243,3 +243,5 @@ const styles = StyleSheet.create({
     // width: "25%",
   },
 });
+
+export default memo(SessionTab);

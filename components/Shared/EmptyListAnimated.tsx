@@ -5,7 +5,11 @@ const DW = Dimensions.get("window").width;
 const DH = Dimensions.get("window").height;
 const ScaleFactor = DW / 411.4286;
 
-export default function TransactionEmpty() {
+interface EmptyListAnimatedProps {
+  text: string;
+}
+
+export default function EmptyListAnimated({ text }: EmptyListAnimatedProps) {
   const loadFade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export default function TransactionEmpty() {
           fontWeight: "bold",
         }}
       >
-        {"No Outstanding Transactions!"}
+        {text}
       </Text>
     </Animated.View>
   );

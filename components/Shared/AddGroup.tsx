@@ -1,19 +1,23 @@
+import config from "@/components/config.json";
+import { fxIndexMap } from "@/components/fxIndexMap";
+import * as SQLiteAPI from "@/components/SQLiteAPI";
+import fxRef from "@/data/fxRef.json";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSQLiteContext } from "expo-sqlite";
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   ColorValue,
   Dimensions,
+  Keyboard,
   StatusBar,
   StyleSheet,
   Text,
-  View,
-  Keyboard,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import {
@@ -22,13 +26,8 @@ import {
 } from "react-native-keyboard-controller";
 import EmojiPicker from "rn-emoji-keyboard";
 import CustomButton from "../customButton";
-import InlineDropdown from "../InLineDropdown";
-import fxRef from "@/data/fxRef.json";
-import { fxIndexMap } from "@/components/fxIndexMap";
-import config from "@/components/config.json";
 import ExpandableList from "../ExpandableList";
-import * as SQLiteAPI from "@/components/SQLiteAPI";
-import { scheduleOnRN } from "react-native-worklets";
+import InlineDropdown from "../InLineDropdown";
 
 const emojiDictionary = require("emoji-dictionary");
 
@@ -78,7 +77,7 @@ const linspace = (start: number, end: number, numPoints: number) => {
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 
-export default function AddGroup() {
+export default function AddGroup({ route }: any) {
   const navigation = useNavigation<any>();
   const db = useSQLiteContext();
 
@@ -93,46 +92,17 @@ export default function AddGroup() {
 
   const slide = useRef(new Animated.Value(0)).current;
 
-  // const fetchData = async () => {
-  //   const tableD: any = await SQLiteAPI.GetTransactionBySession(db, session_id);
-  //   const [tempInfo]: any = await SQLiteAPI.GetSessionInfo(db, session_id);
-  //   const [tempEmoji]: any = await SQLiteAPI.GetTagEmoji(db, tempInfo.tag_id);
-  //   const sectionList = [
-  //     {
-  //       title: "Paid By",
-  //       data: [
-  //         ...tableD.filter(
-  //           (item: any) =>
-  //             item.payer_payee && item.user_group_id === user_group_id
-  //         ),
-  //         ...tableD.filter(
-  //           (item: any) =>
-  //             item.payer_payee && item.user_group_id != user_group_id
-  //         ),
-  //       ],
-  //     },
-  //     {
-  //       title: "Shared By",
-  //       data: [
-  //         ...tableD.filter(
-  //           (item: any) =>
-  //             !item.payer_payee && item.user_group_id === user_group_id
-  //         ),
-  //         ...tableD.filter(
-  //           (item: any) =>
-  //             !item.payer_payee && item.user_group_id != user_group_id
-  //         ),
-  //       ],
-  //     },
-  //   ];
-  //   setSectionedTransaction(sectionList);
-  //   setSessionInfo(tempInfo);
-  //   setEmoji(tempEmoji.emoji);
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  const handleAdd = async () => {
+    try {
+      SQLiteAPI.AddNewGroup(db, groupName, currency, userList, emoji);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      // navigation.replace("GroupView");
+      navigation.goBack();
+    }
+  };
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -258,17 +228,7 @@ export default function AddGroup() {
                       </View>
                       <View style={{ flex: 1, flexDirection: "row-reverse" }}>
                         <CustomButton
-                          onPressOut={() => {
-                            navigation.goBack();
-                            // console.log(emoji, groupName, currency, userList);
-                            SQLiteAPI.AddNewGroup(
-                              db,
-                              groupName,
-                              currency,
-                              userList,
-                              emoji
-                            );
-                          }}
+                          onPressOut={() => handleAdd()}
                           buttonStyle={{
                             height: 40 * ScaleFactor,
                             width: 40 * ScaleFactor,
@@ -284,10 +244,18 @@ export default function AddGroup() {
                         </CustomButton>
                       </View>
                     </View>
-                    <View style={{ marginTop: 10 * ScaleFactor }}>
+                    <View
+                      style={{
+                        marginTop: 10 * ScaleFactor,
+                        alignItems: "center",
+                      }}
+                    >
                       <CustomButton
                         onPressOut={() => {
                           setEmojiKeyboardOpen(true);
+                        }}
+                        frameStyle={{
+                          width: 120 * ScaleFactor,
                         }}
                       >
                         <View

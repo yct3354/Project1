@@ -120,7 +120,7 @@ export default function UserBalance({ item, self }: UserBalanceProps) {
                 <Text
                   style={{
                     ...styles.sumText,
-                    color: item.net > 0 ? "white" : "#FF3B30",
+                    color: item.net >= 0 ? "white" : "#FF3B30",
                   }}
                 >
                   {item.net.toLocaleString(location, {

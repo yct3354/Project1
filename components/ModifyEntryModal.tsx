@@ -873,30 +873,6 @@ export default function ModifyEntryModal({
                       </View>
                     </View>
                     <View style={styles.itemBox2}>
-                      {/* <CustomButton
-                        onPressOut={() => {
-                          !rateOrFor && editState
-                            ? setBaseCurrency(
-                                (baseCurrency + 1) % fxTags.length
-                              )
-                            : {};
-                        }}
-                        frameStyle={{
-                          alignItems: "center",
-                          minWidth: "30%",
-                        }}
-                        buttonStyle={{
-                          backgroundColor: plateColor,
-                          borderColor: editState ? accentColor : "#FFFFFF80",
-                          borderWidth: 2,
-                          paddingHorizontal: 12 * ScaleFactor,
-                          width: "100%",
-                        }}
-                      >
-                        <Text style={{ ...styles.buttonText }}>
-                          {fxTags[baseCurrency]}
-                        </Text>
-                      </CustomButton> */}
                       <InlineDropdown
                         onSelect={(text: string, index: number) => {
                           setBaseCurrency(index);
@@ -1043,8 +1019,8 @@ export default function ModifyEntryModal({
                               Number(hour) > 23
                                 ? 23
                                 : Number(hour) < 0
-                                  ? 0
-                                  : Math.round(Number(hour))
+                                ? 0
+                                : Math.round(Number(hour))
                             )
                           );
                           SlideDown();
@@ -1079,8 +1055,8 @@ export default function ModifyEntryModal({
                               Number(minute) > 59
                                 ? 59
                                 : Number(minute) < 0
-                                  ? 0
-                                  : Math.round(Number(minute))
+                                ? 0
+                                : Math.round(Number(minute))
                             )
                           );
                           SlideDown();

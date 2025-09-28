@@ -1,11 +1,13 @@
 import React from "react";
 
+import { ConfirmProvider } from "@/components/ConfirmProvider";
 import { LoginProvider } from "@/components/LoginProvider";
 import SessionDetails from "@/components/Shared/SessionDetails";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as SQLite from "expo-sqlite";
 import { View } from "react-native";
 import AddGroup from "../components/Shared/AddGroup";
+import AddSession from "../components/Shared/AddSession";
 import GroupView from "../components/Shared/GroupView";
 import SessionView from "../components/Shared/SessionView";
 import FullList from "./FullList";
@@ -90,154 +92,186 @@ export default function RootLayout() {
       options={{ useNewConnection: false }}
     >
       <LoginProvider>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: themeColor,
-          }}
-        >
-          <Stack.Navigator initialRouteName="Home">
-            <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-              options={{
-                headerShown: false,
+        <ConfirmProvider>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: themeColor,
+            }}
+          >
+            <View
+              style={{
+                // flex: 1,
+                height: "100%",
+                backgroundColor: themeColor,
               }}
-            />
-            <Stack.Screen
-              name="FullList"
-              component={FullList}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
+            >
+              <Stack.Navigator initialRouteName="Home">
+                <Stack.Screen
+                  name="Home"
+                  component={HomeScreen}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="FullList"
+                  component={FullList}
+                  options={{
+                    headerShown: false,
+                    animation: "slide_from_right",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="LoginScreen"
+                  component={LoginScreen}
+                  options={{
+                    headerShown: false,
+                    animation: "scale_from_center",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                },
-              }}
-            />
-            <Stack.Screen
-              name="LoginScreen"
-              component={LoginScreen}
-              options={{
-                headerShown: false,
-                animation: "scale_from_center",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="GroupView"
+                  component={GroupView}
+                  options={{
+                    headerShown: false,
+                    animation: "scale_from_center",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="SessionView"
+                  component={SessionView}
+                  options={{
+                    headerShown: false,
+                    animation: "slide_from_right",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                },
-              }}
-            />
-            <Stack.Screen
-              name="GroupView"
-              component={GroupView}
-              options={{
-                headerShown: false,
-                animation: "scale_from_center",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="SessionDetails"
+                  component={SessionDetails}
+                  options={{
+                    headerShown: false,
+                    animation: "slide_from_right",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="AddGroup"
+                  component={AddGroup}
+                  options={{
+                    headerShown: false,
+                    animation: "slide_from_bottom",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                },
-              }}
-            />
-            <Stack.Screen
-              name="SessionView"
-              component={SessionView}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
+                  }}
+                />
+                <Stack.Screen
+                  name="AddSession"
+                  component={AddSession}
+                  options={{
+                    headerShown: false,
+                    animation: "slide_from_bottom",
+                    transitionSpec: {
+                      open: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Faster open animation (150ms)
+                        },
+                      },
+                      close: {
+                        animation: "timing",
+                        config: {
+                          duration: 300, // Slower close animation (500ms)
+                        },
+                      },
                     },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
-                    },
-                  },
-                },
-              }}
-            />
-            <Stack.Screen
-              name="SessionDetails"
-              component={SessionDetails}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
-                    },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
-                    },
-                  },
-                },
-              }}
-            />
-            <Stack.Screen
-              name="AddGroup"
-              component={AddGroup}
-              options={{
-                headerShown: false,
-                animation: "slide_from_bottom",
-                transitionSpec: {
-                  open: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Faster open animation (150ms)
-                    },
-                  },
-                  close: {
-                    animation: "timing",
-                    config: {
-                      duration: 300, // Slower close animation (500ms)
-                    },
-                  },
-                },
-              }}
-            />
-          </Stack.Navigator>
-        </View>
+                  }}
+                />
+              </Stack.Navigator>
+            </View>
+          </View>
+        </ConfirmProvider>
       </LoginProvider>
     </SQLite.SQLiteProvider>
   );
