@@ -1,3 +1,3 @@
-# Personal Finance Manager App (Work In Process)
+# Personal Finance Manager App (Work In Progess)
 
 
